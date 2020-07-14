@@ -408,8 +408,7 @@ public class Controller {
         soluciones = new ArrayList();
         this.beneMax = 0;
         this.cargarMochila(0, x, 0, 0);
-        String ans = "Con un beneficio máximo de " + beneMax + ", las soluciones son:\n";
-        ans += "Las soluciones posibles son:\n\n";
+        String ans = "Con un beneficio máximo de " + beneMax + ", las soluciones son:\n\n";
         for (int i = 0; i < soluciones.size(); i++) {
             ans += "Solución #" + (i + 1) + ": ";
             for (int j = 0; j < soluciones.get(i).length; j++) {
