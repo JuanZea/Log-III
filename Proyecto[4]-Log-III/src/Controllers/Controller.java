@@ -27,10 +27,10 @@ public class Controller {
     TextField in_beneficios;
     @FXML
     TextField in_capacidad;
-
+    
     @FXML
     TextField out_cantidad;
-
+    
     @FXML
     TextArea tb_1;
     @FXML
@@ -39,10 +39,10 @@ public class Controller {
     TextArea tb_3;
     @FXML
     TextArea tb_4;
-
+    
     @FXML
     ComboBox cb_rango;
-
+    
     private int n;
     private int[] v;
     private int[] vUI;
@@ -52,27 +52,33 @@ public class Controller {
     private int cantidad;
     private int capacidad;
     private ArrayList<boolean[]> soluciones;
-
+    
     public void generarEntero() {
         Random rnd = new Random();
         this.n = rnd.nextInt(41) + 10;
         String ans = "El número n es: " + this.n + "\n";
         this.tb_1.setText(ans);
     }
-
+    
     public void generarVector() {
         Random rnd = new Random();
         if (this.n == 0) {
             JOptionPane.showMessageDialog(null, "Primero genere un entero con la opción 1.", "ERROR", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        v = new int[this.n + 1];
-        for (int i = 1; i < v.length; i++) {
-            v[i] = rnd.nextInt(100) + 1;
+        this.v = new int[this.n + 1];
+        int candidato;
+        for (int i = 1; i < v.length; i++) { // Modificado para que no genere datos repetidos
+            candidato = rnd.nextInt(100) + 1;
+            if (this.pertenece(candidato, this.v)) {
+                i--;
+                continue;
+            }
+            v[i] = candidato;
         }
         this.mostrar(1);
     }
-
+    
     public void Ordenar() {
         if (this.v == null) {
             JOptionPane.showMessageDialog(null, "No se ha generado ningún vector", "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -106,7 +112,7 @@ public class Controller {
         this.vUI = (int[]) pila.pop();
         this.mostrar(2);
     }
-
+    
     public void intercalar(int inicio, int mitad, int fin) {
         int[] w = new int[v.length];
         for (int i = inicio; i <= fin; i++) {
@@ -136,7 +142,7 @@ public class Controller {
             j++;
         }
     }
-
+    
     public void combinaciones() {
         int r;
         try {
@@ -189,11 +195,63 @@ public class Controller {
             }
         }
     }
-
-    public void AlgoritmoNK() {
-
+    
+    public void validarAlgoritmoNK() {
+        int n, k;
+        try {
+            n = Integer.parseInt(this.in_n.getText());
+        } catch (NumberFormatException exception) {
+            JOptionPane.showMessageDialog(null, "El formato de la variable n es incorrecto", "ERROR", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (n <= 0) {
+            JOptionPane.showMessageDialog(null, "El valor de n debe ser un número mayor que 0", "ERROR", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            k = Integer.parseInt(this.in_k.getText());
+        } catch (NumberFormatException exception) {
+            JOptionPane.showMessageDialog(null, "El formato de la variable k es incorrecto", "ERROR", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        this.n = n;
+        this.generarVector();
+        if (k > n) {
+            JOptionPane.showMessageDialog(null, "El dato k indica una posición prohibida en el vector", "ERROR", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        int posicion = this.algoritmoNK(n, k);
+        String ans = this.tb_1.getText();
+        ans += "\nLa bola mágica predice que la posición del valor k sera la posición: " + posicion;
+        this.tb_1.setText(ans);
+//        Random rnd = new Random();
+//        int[] vector = new int[n + 1];
+//        for (int i = 1; i < vector.length; i++) {
+//            vector[i] = rnd.nextInt(100) + 1;
+//        }
+    
     }
-
+    
+    public int algoritmoNK(int n, int k) {
+        int posicion = 1;
+        for (int i = 1; i < this.v.length; i++) {
+            if (this.v[i] <= k) {
+                continue;
+            }
+            posicion++;
+        }
+        return posicion;
+    }
+    
+    public boolean pertenece(int k, int[] v) {
+        for (int dato : v) {
+            if (dato == k) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public void calcularPrimos() {
         int[] primos = new int[1000];
         primos[0] = 2;
@@ -215,7 +273,7 @@ public class Controller {
         this.primos = primos;
         this.mostrarPrimos();
     }
-
+    
     /**
      * @param ansI 1: Generado, 2: Ordenado
      */
@@ -242,7 +300,7 @@ public class Controller {
         }
         this.tb_1.setText(ans);
     }
-
+    
     public int[] copiar(int[] v) {
         int[] vCopia = new int[v.length];
         for (int i = 0; i < v.length; i++) {
@@ -250,7 +308,7 @@ public class Controller {
         }
         return vCopia;
     }
-
+    
     public boolean[] copiar(boolean[] v) {
         boolean[] vCopia = new boolean[v.length];
         for (int i = 0; i < v.length; i++) {
@@ -258,7 +316,7 @@ public class Controller {
         }
         return vCopia;
     }
-
+    
     public void mostrarPrimos() {
         String ans = "Los números primos entre 1 y 1000 son:\n";
         for (int i = 0; i < this.primos.length; i++) {
@@ -278,7 +336,7 @@ public class Controller {
         }
         this.cb_rango.setItems(rangos);
     }
-
+    
     public void actualizarCantidad() {
         int select = this.cb_rango.getSelectionModel().getSelectedIndex();
         if (select == -1) {
@@ -300,7 +358,7 @@ public class Controller {
         int num = i - k;
         this.out_cantidad.setText(String.valueOf(num));
     }
-
+    
     public void calcularFormas() {
         if (this.in_pesos.getText().isEmpty() || this.in_beneficios.getText().isEmpty() || this.in_capacidad.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Hay datos sin ingresar", "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -334,17 +392,17 @@ public class Controller {
         // Verificar entradas negativas
         boolean[] x = new boolean[cantidad];
         for (int i = 0; i < x.length; i++) {
-          x[i] = false;
+            x[i] = false;
         }
-        try{
-          capacidad = Integer.parseInt(this.in_capacidad.getText());
-          if(capacidad <= 0){
-            JOptionPane.showMessageDialog(null, "La capacidad debe ser mayor que 0", "ERROR", JOptionPane.ERROR_MESSAGE);
+        try {
+            capacidad = Integer.parseInt(this.in_capacidad.getText());
+            if (capacidad <= 0) {
+                JOptionPane.showMessageDialog(null, "La capacidad debe ser mayor que 0", "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException exception) {
+            JOptionPane.showMessageDialog(null, "El formato de la capacidad no es válido", "ERROR", JOptionPane.ERROR_MESSAGE);
             return;
-          }
-        }catch (NumberFormatException exception) {
-          JOptionPane.showMessageDialog(null, "El formato de la capacidad no es válido", "ERROR", JOptionPane.ERROR_MESSAGE);
-          return;
         }
         soluciones = new ArrayList();
         this.cargarMochila(0, x, 0, 0, 0);
@@ -357,33 +415,33 @@ public class Controller {
         }
         this.tb_4.setText(ans);
     }
-
-    public void cargarMochila(int i, boolean[] x, int beneT, int pesoT, int beneMax){
+    
+    public void cargarMochila(int i, boolean[] x, int beneT, int pesoT, int beneMax) {
 //         for (int j = 0; j < beneficios.length; j++) {
 //             beneT += beneficios[j];
 //         }
-         if(this.cantidad <= i){
-             if(beneT > beneMax){
-               //reemplazar(mejorX, X);
-               beneMax = beneT;
-             }
-             return;
-         }
-         if(pesoT + pesos[i] <= capacidad){
-           x[i] = true;
-           pesoT += this.pesos[i];
-           beneT += this.beneficios[i];
-           cargarMochila(++i, x, beneT, pesoT, beneMax);
-           if(beneT == beneMax){
-               soluciones.add(this.copiar(x));
-           }else if(beneT > beneMax){
-               soluciones = new ArrayList<>();
-               soluciones.add(this.copiar(x));
-           }
-           x[i] = false;
-           pesoT -= pesos[i];
-           beneT -= beneficios[i];
-         }
-         cargarMochila(++i, x, beneT, pesoT, beneMax);
-     }
+        if (this.cantidad <= i) {
+            if (beneT > beneMax) {
+                //reemplazar(mejorX, X);
+                beneMax = beneT;
+            }
+            return;
+        }
+        if (pesoT + pesos[i] <= capacidad) {
+            x[i] = true;
+            pesoT += this.pesos[i];
+            beneT += this.beneficios[i];
+            cargarMochila(++i, x, beneT, pesoT, beneMax);
+            if (beneT == beneMax) {
+                soluciones.add(this.copiar(x));
+            } else if (beneT > beneMax) {
+                soluciones = new ArrayList<>();
+                soluciones.add(this.copiar(x));
+            }
+            x[i] = false;
+            pesoT -= pesos[i];
+            beneT -= beneficios[i];
+        }
+        cargarMochila(++i, x, beneT, pesoT, beneMax);
+    }
 }
