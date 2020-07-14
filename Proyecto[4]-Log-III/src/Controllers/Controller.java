@@ -50,6 +50,7 @@ public class Controller {
     private int[] pesos;
     private int[] beneficios;
     private int cantidad;
+    private int beneMax;
     private int capacidad;
     private ArrayList<boolean[]> soluciones;
     
@@ -405,43 +406,41 @@ public class Controller {
             return;
         }
         soluciones = new ArrayList();
-        this.cargarMochila(0, x, 0, 0, 0);
-        String ans = "Las soluciones posibles son:\n";
+        this.beneMax = 0;
+        this.cargarMochila(0, x, 0, 0);
+        String ans = "Con un beneficio máximo de " + beneMax + " las soluciones son:\n";
+        ans += "Las soluciones posibles son:\n";
         for (int i = 0; i < soluciones.size(); i++) {
             ans += "Solucion #" + (i + 1) + ":\n";
             for (int j = 0; j < soluciones.get(i).length; j++) {
-                ans += "Objeto #" + (j + 1) + soluciones.get(i)[j] + "\n";
+                if (soluciones.get(i)[j] == true)
+                    ans += "Objeto # " + (j + 1) + "\n";
             }
         }
         this.tb_4.setText(ans);
     }
     
-    public void cargarMochila(int i, boolean[] x, int beneT, int pesoT, int beneMax) {
-//         for (int j = 0; j < beneficios.length; j++) {
-//             beneT += beneficios[j];
-//         }
+    
+    public void cargarMochila(int i, boolean[] x, int beneT, int pesoT) {
         if (this.cantidad <= i) {
-            if (beneT > beneMax) {
-                //reemplazar(mejorX, X);
-                beneMax = beneT;
-            }
-            return;
-        }
-        if (pesoT + pesos[i] <= capacidad) {
-            x[i] = true;
-            pesoT += this.pesos[i];
-            beneT += this.beneficios[i];
-            cargarMochila(++i, x, beneT, pesoT, beneMax);
             if (beneT == beneMax) {
                 soluciones.add(this.copiar(x));
             } else if (beneT > beneMax) {
                 soluciones = new ArrayList<>();
                 soluciones.add(this.copiar(x));
+                beneMax = beneT;
             }
-            x[i] = false;
-            pesoT -= pesos[i];
-            beneT -= beneficios[i];
+        } else {
+            if (pesoT + pesos[i] <= capacidad) {
+                x[i] = true;
+                pesoT += this.pesos[i];
+                beneT += this.beneficios[i];
+                cargarMochila(i + 1, x, beneT, pesoT);
+                x[i] = false;
+                pesoT -= pesos[i];
+                beneT -= beneficios[i];
+            }
+            cargarMochila(i + 1, x, beneT, pesoT);
         }
-        cargarMochila(++i, x, beneT, pesoT, beneMax);
     }
 }
